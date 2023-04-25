@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:rundolist/core/injector/services.dart';
+import 'package:rundolist/src/presentation/app.dart';
 
-import 'feature/run_do_list.dart';
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initServices();
 
-void main(final List<String> args) {
-  runApp(const RunDoList());
+  runApp(const App());
 }
