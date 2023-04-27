@@ -28,9 +28,13 @@ mixin GlobalContextUtil on Object {
       throw UnimplementedError();
     }
 
-    await showDialog<String?>(
+    final T? result = await showDialog<T?>(
       context: context!,
       builder: (_) => dialog,
     );
+
+    if (result != null) {
+      callback(result);
+    }
   }
 }

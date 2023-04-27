@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-// import 'package:flutter/material.dart';
 import 'package:rundolist/core/injector/services.dart';
 import 'package:rundolist/core/usecase/usecase.dart';
 import 'package:rundolist/src/domain/entities/enums/fade.dart';
@@ -225,15 +224,11 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextUtil {
       (element) => element.id == event.id,
     );
 
-    await showGlobalDialog<String?>(
+    await showGlobalDialog<String>(
       ChangePromtDialog(
         initialValue: promt.data,
       ),
-      (String? data) {
-        if (data == null) {
-          return;
-        }
-
+      (String data) {
         /// Prepare [Promt] for update
         final Promt update = Promt(
           id: promt.id,
@@ -258,41 +253,6 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextUtil {
         );
       },
     );
-
-    // final ctx = App.globalNavKey.currentContext;
-
-    // if (ctx != null) {
-    //   // Await [String] value as future [Promt] data for update from [ChangePromtDialog]
-    //   final updatedData = await showDialog<String?>(
-    //     context: ctx,
-    //     builder: (_) => ChangePromtDialog(
-    //       initialValue: promt.data,
-    //     ),
-    //   );
-
-    //   if (updatedData != null) {
-    //     // New [Promt] for change
-    //     final updatedPromt = Promt(
-    //       id: promt.id,
-    //       data: updatedData,
-    //       fadeController: promt.fadeController,
-    //     );
-
-    //     // Write changes
-    //     promts.removeWhere((element) => element.id == event.id);
-    //     promts.add(updatedPromt);
-
-    //     emit(
-    //       LoadedPromtState(
-    //         promts: promts,
-    //         reloadFlag: true,
-    //         addButtonFadeController: _addFadeController,
-    //         randomProgress: (state as LoadedPromtState).randomProgress,
-    //         randomPromt: (state as LoadedPromtState).randomPromt,
-    //       ),
-    //     );
-    //   }
-    // }
 
     // Update flag cause of end editing
     lastEditID = null;
@@ -350,8 +310,6 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextUtil {
 
     emit(
       LoadedPromtState(
-        progress: qState.progress,
-        reloadFlag: true,
         randomPromt: qState.randomPromt,
         promts: qState.promts,
         buttonFadeController: qState.buttonFadeController,
