@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rundolist/src/domain/entities/promt.dart';
 import 'package:rundolist/src/presentation/controllers/promt/promt_bloc.dart';
-import 'package:rundolist/src/presentation/pages/result_page.dart';
 
 class PromtChip extends StatefulWidget {
   final Promt promt;

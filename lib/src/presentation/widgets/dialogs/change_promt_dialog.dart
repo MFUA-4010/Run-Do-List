@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rundolist/core/injector/services.dart';
 import 'package:rundolist/src/presentation/controllers/promt/promt_bloc.dart';
 
