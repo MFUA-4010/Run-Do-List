@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rundolist/src/domain/entities/enums/progress.dart';
 import 'package:rundolist/src/domain/entities/promt.dart';
 import 'package:rundolist/src/presentation/controllers/duration/duration_bloc.dart';
 import 'package:rundolist/src/presentation/controllers/promt/promt_bloc.dart';
 import 'package:rundolist/src/presentation/pages/result_page.dart';
 import 'package:rundolist/src/presentation/widgets/add_chip.dart';
+import 'package:rundolist/src/presentation/widgets/chips/add_chip.dart';
+import 'package:rundolist/src/presentation/widgets/chips/promt_chip.dart';
 import 'package:rundolist/src/presentation/widgets/dialogs/change_time_dialog.dart';
 import 'package:rundolist/src/presentation/widgets/dialogs/new_promt_dialog.dart';
 import 'package:rundolist/src/presentation/widgets/promt_chip.dart';
@@ -96,10 +99,10 @@ class _Content extends StatelessWidget {
     return BlocConsumer<PromtBloc, PromtState>(
       listener: (context, state) {
         if (state is LoadedPromtState) {
-          if (state.randomProgress == RandomProgress.onFinished) {
+          if (state.progress == Progress.done) {
             Navigator.of(context).pushNamed(
               ResultPage.route,
-              arguments: state.result,
+              arguments: state.randomPromt,
             );
           }
         }
@@ -118,11 +121,11 @@ class _Content extends StatelessWidget {
                   state.promts.length,
                   (i) {
                     final Promt promt = state.promts.elementAt(i);
-
-                    return PromtChip(promt);
+                    return PromtChip(promt: promt);
                   },
                 ),
                 AddChip(
+                  fadeController: state.buttonFadeController,
                   onPressed: onAddPressed,
                 ),
               ],
@@ -182,7 +185,7 @@ class _Footer extends StatelessWidget {
                 return Row(
                   children: [
                     Visibility(
-                      visible: state.randomProgress == RandomProgress.onClose,
+                      visible: state.progress == Progress.inactive,
                       child: IconButton(
                         onPressed: onTimeChangePressed,
                         icon: const Icon(
@@ -195,7 +198,7 @@ class _Footer extends StatelessWidget {
                         onPressed: onRandomPressed,
                         child: Builder(
                           builder: (_) {
-                            if (state.randomProgress == RandomProgress.onProgress) {
+                            if (state.progress == Progress.active) {
                               return Text(
                                 'Stop'.toUpperCase(),
                                 style: Theme.of(context).textTheme.bodyLarge,

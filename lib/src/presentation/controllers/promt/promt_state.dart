@@ -1,11 +1,6 @@
 part of 'promt_bloc.dart';
 
-enum RandomProgress {
-  onClose,
-  onProgress,
-  onFinished,
-}
-
+/// [PromtBloc] States
 abstract class PromtState extends Equatable {
   const PromtState();
 
@@ -13,25 +8,30 @@ abstract class PromtState extends Equatable {
   List<Object> get props => [];
 }
 
+/// [PromtBloc] initialization [PromtState]
 class InitialPromtState extends PromtState {
   const InitialPromtState();
 }
 
+/// [PromtState] that storing data for rendering home page
 class LoadedPromtState extends PromtState {
-  final StreamController<bool> chipController;
+  final Progress progress;
+
+  final bool reloadFlag;
+
+  final Promt? randomPromt;
   final List<Promt> promts;
-  final bool changedPromtsFlag;
-  final RandomProgress randomProgress;
-  final Promt? result;
+
+  final StreamController<Fade> buttonFadeController;
 
   const LoadedPromtState({
-    required this.chipController,
+    this.progress = Progress.inactive,
+    this.reloadFlag = false,
+    this.randomPromt,
     required this.promts,
-    this.changedPromtsFlag = false,
-    this.randomProgress = RandomProgress.onClose,
-    this.result,
+    required this.buttonFadeController,
   });
 
   @override
-  List<Object> get props => [promts, changedPromtsFlag, randomProgress];
+  List<Object> get props => [reloadFlag, progress, promts];
 }

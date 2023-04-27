@@ -12,18 +12,23 @@ class ChangePromtDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = TextEditingController();
+
+    /// Restore previous value
     controller.text = initialValue;
 
+    /// Handler for delete action
     void onDeletePressed() {
       final bloc = services<PromtBloc>();
-      // final bloc = BlocProvider.of<PromtBloc>(context);
-      bloc.add(RemovePromtEvent(id: bloc.editingPromtId ?? ''));
+      if (bloc.lastEditID != null) {
+        bloc.add(RemovePromtEvent(id: bloc.lastEditID!));
+      }
 
       Navigator.pop<String?>(
         context,
       );
     }
 
+    /// Handler for update action
     void onUpdatePressed() {
       Navigator.pop<String?>(
         context,

@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:rundolist/utils/global_context_mixin.dart';
 
-class EmptySnackBar extends SnackBar {
-  EmptySnackBar(BuildContext context)
-      : super(
+class AppSnackBar extends SnackBar with GlobalContextUtil {
+  AppSnackBar(
+    BuildContext context,
+    String title,
+  ) : super(
           content: Text(
-            'There`s no promts',
+            title,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Theme.of(context).cardColor,
+                  color: Theme.of(context).colorScheme.onError,
                 ),
           ),
-          backgroundColor: Theme.of(context).primaryColor,
+          backgroundColor: Theme.of(context).colorScheme.onError,
           duration: const Duration(milliseconds: 800),
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
