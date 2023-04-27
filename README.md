@@ -1,9 +1,9 @@
 # Run Do List
 
-`Application for randomizing custom events`
+Randomizing custom events project
 
 ## Progress
 
-In Develop
+- In Develop
 
-*Currently hosted at https://mfua-4010.github.io/Run-Do-List-Web/* 
+*Currently hosted at https://mfua-4010.github.io/public/* 
