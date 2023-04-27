@@ -8,17 +8,18 @@ import 'package:rundolist/src/presentation/controllers/promt/promt_bloc.dart';
 import 'package:rundolist/src/presentation/pages/forbidden_page.dart';
 import 'package:rundolist/src/presentation/pages/home_page.dart';
 import 'package:rundolist/src/presentation/pages/result_page.dart';
+import 'package:rundolist/utils/global_context_mixin.dart';
 
-class App extends StatelessWidget {
-  const App({super.key});
+class App extends StatelessWidget with GlobalContextUtil {
+  static const appTitle = 'Run Do List';
 
-  static final globalNavKey = GlobalKey<NavigatorState>();
+  App({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Run Do List',
-      navigatorKey: globalNavKey,
+      title: appTitle,
+      navigatorKey: key,
       theme: ThemeData(useMaterial3: true, colorScheme: lightColorScheme),
       themeMode: ThemeMode.light,
       debugShowCheckedModeBanner: false,

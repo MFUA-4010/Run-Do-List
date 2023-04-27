@@ -3,19 +3,24 @@ import 'dart:math';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 import 'package:rundolist/core/injector/services.dart';
+import 'package:rundolist/core/usecase/usecase.dart';
+import 'package:rundolist/src/domain/entities/enums/fade.dart';
+import 'package:rundolist/src/domain/entities/enums/progress.dart';
 import 'package:rundolist/src/domain/entities/promt.dart';
-import 'package:rundolist/src/presentation/app.dart';
+import 'package:rundolist/src/domain/usecases/restore_cached_promts_usecase.dart';
 import 'package:rundolist/src/presentation/controllers/duration/duration_bloc.dart';
 import 'package:rundolist/src/presentation/widgets/dialogs/change_promt_dialog.dart';
-import 'package:rundolist/src/presentation/widgets/snacks/empty_snack_bar.dart';
+import 'package:rundolist/src/presentation/widgets/snack_bars/empty_promt_error_snack_bar.dart';
+import 'package:rundolist/utils/global_context_mixin.dart';
 import 'package:uuid/uuid.dart';
 
 part 'promt_event.dart';
 part 'promt_state.dart';
 
-class PromtBloc extends Bloc<PromtEvent, PromtState> {
+/// Home page controller [Bloc]
+class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextUtil {
+  /// [PromtBloc] constructor that handles all [Bloc] events
   PromtBloc() : super(const InitialPromtState()) {
     on<ReloadPromtEvent>(_onReloadPromtEvent);
     on<AddPromtEvent>(_onAddPromtEvent);
@@ -24,142 +29,246 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> {
     on<RestoreSelectingPromtEvent>(_onRestoreSelectingPromtEvent);
     on<DoRandomPromtEvent>(_onDoRandomPromtEvent);
 
+    /// Call initial event on load application
     add(const ReloadPromtEvent());
   }
 
-  final _chipController = StreamController<bool>();
+  /// Boolean checker for break [_doRandomHiding] removing
+  bool _removeCheck = false;
 
-  FutureOr<void> _onReloadPromtEvent(
+  /// Method for randomize hide promts from [LoadedPromtState]
+  FutureOr<void> _doRandomHiding(
+    LoadedPromtState state,
+    void Function(int) onFinished,
+  ) async {
+    /// Prepare final random element index
+    final int finalResult = Random().nextInt(state.promts.length);
+
+    /// Storing elements that have been fade
+    final hidedPromts = <int>[];
+
+    for (int i = 0; i < state.promts.length - 1; i++) {
+      /// Stop [_randomFadePromts] method if [_removeCheck] before animation
+      if (_removeCheck) break;
+
+      //? First Half of entered Duraion
+      final animationDuration = services<DurationBloc>().state;
+      await Future.delayed(Duration(milliseconds: animationDuration.inMilliseconds ~/ 2));
+      /////
+
+      /// Next element index that will be fade
+      int nextRandom;
+
+      /// Re-roll next element index if one `s already in fade
+      do {
+        nextRandom = Random().nextInt(state.promts.length);
+      } while (hidedPromts.contains(nextRandom) || nextRandom == finalResult);
+
+      /// Store generated [nextRandom] for calc next generations
+      hidedPromts.add(nextRandom);
+
+      /// Retriev Fade [StreamController] of current fading element
+      final controller = state.promts.elementAt(nextRandom).fadeController;
+
+      /// Fade current element
+      controller.add(Fade.half);
+
+      /// Stop [_randomFadePromts] method if [_removeCheck] after fade
+      if (_removeCheck) break;
+
+      //? Second Half of entered Duraion
+      await Future.delayed(Duration(milliseconds: animationDuration.inMilliseconds ~/ 2));
+      /////
+    }
+
+    /// Stop [_randomFadePromts] method if [_removeCheck] after all elem's have been faded
+    if (_removeCheck) return;
+
+    /// Await delay before show [ResultPage]
+    await Future.delayed(
+      //? Implement options
+      const Duration(seconds: 1),
+    );
+
+    /// Return pseudo result
+    onFinished(finalResult);
+  }
+
+//! HANDLERS
+
+  /// [PromtBloc] method that handles [ReloadPromtEvent]
+  Future<FutureOr<void>> _onReloadPromtEvent(
     ReloadPromtEvent event,
     Emitter<PromtState> emit,
-  ) {
-    emit(
-      //TODO: Implement service loading
-      LoadedPromtState(
-        promts: const [],
-        chipController: _chipController,
-      ),
+  ) async {
+    final dataOrError = await RestoreCachedPromtsUseCase().call(const NoParam());
+
+    /// New fade [StreamController] for 'add promt' button
+    final StreamController<Fade> fadeController = StreamController<Fade>();
+
+    dataOrError.fold(
+      (error) {
+        emit(
+          LoadedPromtState(
+            promts: const [],
+            buttonFadeController: fadeController,
+          ),
+        );
+      },
+      (data) {
+        //TODO: implement cache restorin'
+        emit(
+          LoadedPromtState(
+            promts: const [],
+            buttonFadeController: fadeController,
+          ),
+        );
+      },
     );
   }
 
+  /// [PromtBloc] method that handles [AddPromtEvent]
   FutureOr<void> _onAddPromtEvent(
     AddPromtEvent event,
     Emitter<PromtState> emit,
   ) {
-    if (state is LoadedPromtState) {
-      final controller = StreamController<bool>();
-
-      controller.add(false);
-
-      final promts = <Promt>[
-        ...(state as LoadedPromtState).promts,
-        Promt(
-          id: const Uuid().v1(),
-          data: event.data,
-          controller: controller,
-        ),
-      ];
-
-      controller.add(true);
-
-      emit(
-        LoadedPromtState(
-          promts: promts,
-          chipController: _chipController,
-        ),
-      );
+    if (state is! LoadedPromtState) {
+      throw UnimplementedError();
     }
+
+    final LoadedPromtState qState = state as LoadedPromtState;
+
+    /// New fade [StreamController] for 'promt' chip
+    final StreamController<Fade> fadeController = StreamController<Fade>();
+
+    /// New 'promt' chip animation start point
+    fadeController.add(Fade.hide);
+
+    /// Storage for promts after add new one
+    final promts = <Promt>[];
+
+    /// Add all prev. promts
+    promts.addAll(qState.promts);
+
+    promts.add(
+      Promt(
+        id: const Uuid().v1(),
+        data: event.data,
+        fadeController: fadeController,
+      ),
+    );
+
+    /// Start new 'promt' animation
+    fadeController.add(Fade.show);
+
+    emit(
+      LoadedPromtState(
+        progress: qState.progress,
+        promts: promts,
+        buttonFadeController: qState.buttonFadeController,
+      ),
+    );
   }
 
-  // Store currently editing [Promt] id on [ProntState]
-  // Needs to be stored for remove feature reaction
-  String? editingPromtId;
+  /// Store currently editing [Promt] id on [ProntState]
+  /// Needs to be stored for remove feature reaction
+  String? _lastEditID;
 
+  String? get lastEditID => _lastEditID;
+
+  /// Override [_lastEditID] set with out-of-id checking
+  set lastEditID(String? id) {
+    if (state is! LoadedPromtState) {
+      _lastEditID = null;
+    }
+
+    final LoadedPromtState qState = state as LoadedPromtState;
+
+    if (qState.promts.where((element) => element.id == id).isEmpty) {
+      _lastEditID = null;
+    }
+
+    _lastEditID = id;
+  }
+
+  /// [PromtBloc] method that handles [SelectPromtEvent]
   FutureOr<void> _onSelectPromtEvent(
     SelectPromtEvent event,
     Emitter<PromtState> emit,
   ) async {
-    /** DEPRECATED
-     * 
-     * Promt deselect`
-    if (state is LoadedPromtState) {
-      (state as LoadedPromtState)
-          .promts
-          .firstWhere(
-            (element) => element.id == event.id,
-          )
-          .controller
-          .add(false);
+    if (state is! LoadedPromtState) {
+      _lastEditID = null;
     }
-    */
 
-    editingPromtId = event.id;
+    final LoadedPromtState qState = state as LoadedPromtState;
 
-    // Flag recovery
+    // Update flag cause of start editing
+    lastEditID = event.id;
+
+    /// Recover flag for next [SelectPromtState]
     emit(
       LoadedPromtState(
-        promts: (state as LoadedPromtState).promts,
-        chipController: _chipController,
-        randomProgress: (state as LoadedPromtState).randomProgress,
-        result: (state as LoadedPromtState).result,
+        progress: qState.progress,
+        randomPromt: qState.randomPromt,
+        promts: qState.promts,
+        buttonFadeController: qState.buttonFadeController,
       ),
     );
 
-    // New [Promt] Storage
+    /// New [Promt] Storage
     final promts = <Promt>[];
-    promts.addAll((state as LoadedPromtState).promts);
+    promts.addAll(qState.promts);
 
-    // Previous [Promt]
-    final Promt promt = (state as LoadedPromtState).promts.firstWhere(
-          (element) => element.id == event.id,
-        );
+    /// Previous [Promt]
+    final Promt promt = qState.promts.firstWhere(
+      (element) => element.id == event.id,
+    );
 
-    //! Global Dialog Message
-
-    final ctx = App.globalNavKey.currentContext;
-
-    if (ctx != null) {
-      // Await [String] value as future [Promt] data for update from [ChangePromtDialog]
-      final updatedData = await showDialog<String?>(
-        context: ctx,
-        builder: (_) => ChangePromtDialog(
-          initialValue: promt.data,
-        ),
-      );
-
-      if (updatedData != null) {
-        // New [Promt] for change
-        final updatedPromt = Promt(
+    await showGlobalDialog<String>(
+      ChangePromtDialog(
+        initialValue: promt.data,
+      ),
+      (String data) {
+        /// Prepare [Promt] for update
+        final Promt update = Promt(
           id: promt.id,
-          data: updatedData,
-          controller: promt.controller,
+          data: data,
+          fadeController: promt.fadeController,
         );
 
-        // Write changes
+        /// Remove prev [Promt]
         promts.removeWhere((element) => element.id == event.id);
-        promts.add(updatedPromt);
+
+        /// Add updated [Promt]
+        promts.add(update);
 
         emit(
           LoadedPromtState(
+            progress: qState.progress,
+            reloadFlag: true,
+            randomPromt: qState.randomPromt,
             promts: promts,
-            changedPromtsFlag: true,
-            chipController: _chipController,
-            randomProgress: (state as LoadedPromtState).randomProgress,
-            result: (state as LoadedPromtState).result,
+            buttonFadeController: qState.buttonFadeController,
           ),
         );
-      }
-    }
+      },
+    );
 
-    //! --
-
-    editingPromtId = null;
+    // Update flag cause of end editing
+    lastEditID = null;
   }
 
+  /// [PromtBloc] method that handles [RemovePromtEvent]
   FutureOr<void> _onRemovePromtEvent(
     RemovePromtEvent event,
     Emitter<PromtState> emit,
   ) {
+    if (state is! LoadedPromtState) {
+      _lastEditID = null;
+    }
+
+    final LoadedPromtState qState = state as LoadedPromtState;
+
     // New [Promt] Storage
     final promts = <Promt>[];
     promts.addAll((state as LoadedPromtState).promts);
@@ -169,156 +278,113 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> {
 
     emit(
       LoadedPromtState(
+        buttonFadeController: qState.buttonFadeController,
+        reloadFlag: true,
+        progress: qState.progress,
         promts: promts,
-        changedPromtsFlag: true,
-        chipController: _chipController,
-        randomProgress: (state as LoadedPromtState).randomProgress,
-        result: (state as LoadedPromtState).result,
+        randomPromt: qState.randomPromt,
       ),
     );
   }
 
+  /// [PromtBloc] method that handles [RestoreSelectingPromtEvent]
   Future<FutureOr<void>> _onRestoreSelectingPromtEvent(
     RestoreSelectingPromtEvent event,
     Emitter<PromtState> emit,
   ) async {
-    //! Random Removing Animation Fix
+    if (state is! LoadedPromtState) {
+      _lastEditID = null;
+    }
 
+    final LoadedPromtState qState = state as LoadedPromtState;
+
+    //! Random removing duration animation fix
     final animationDuration = services<DurationBloc>().state;
     await Future.delayed(animationDuration);
 
-    //! --
-
-    if (state is LoadedPromtState) {
-      for (final e in (state as LoadedPromtState).promts) {
-        e.controller.add(true);
-      }
-
-      _chipController.add(true);
-
-      emit(
-        LoadedPromtState(
-          promts: (state as LoadedPromtState).promts,
-          chipController: _chipController,
-        ),
-      );
+    /// Restore hided elements
+    qState.buttonFadeController.add(Fade.show);
+    for (final Promt el in qState.promts) {
+      el.fadeController.add(Fade.show);
     }
+
+    emit(
+      LoadedPromtState(
+        randomPromt: qState.randomPromt,
+        promts: qState.promts,
+        buttonFadeController: qState.buttonFadeController,
+      ),
+    );
   }
 
+  /// [PromtBloc] method that handles [DoRandomPromtEvent]
   FutureOr<void> _onDoRandomPromtEvent(
     DoRandomPromtEvent event,
     Emitter<PromtState> emit,
   ) async {
-    if (state is LoadedPromtState) {
-      final progress = (state as LoadedPromtState).randomProgress;
+    if (state is! LoadedPromtState) {
+      _lastEditID = null;
+    }
 
-      switch (progress) {
-        case RandomProgress.onClose:
-          removeCheck = false;
+    final LoadedPromtState qState = state as LoadedPromtState;
 
-          if ((state as LoadedPromtState).promts.isEmpty) {
-            //! Global SnackBar Message
+    switch (qState.progress) {
+      case Progress.inactive:
+        _removeCheck = false;
 
-            final ctx = App.globalNavKey.currentContext;
+        if (qState.promts.isEmpty) {
+          showGlobalSnackBar(
+            EmptyPromtErrorSnackBar(context!),
+          );
+        } else {
+          /// Hide add button on start randomizing
+          qState.buttonFadeController.add(Fade.hide);
 
-            if (ctx != null) {
-              ScaffoldMessenger.of(ctx).showSnackBar(
-                EmptySnackBar(ctx),
-              );
-            }
-
-            //! --
-          } else {
-            emit(
-              LoadedPromtState(
-                promts: (state as LoadedPromtState).promts,
-                chipController: _chipController,
-                randomProgress: RandomProgress.onProgress,
-              ),
-            );
-
-            _chipController.add(false);
-            await startRandomRemoving(
-              state as LoadedPromtState,
-              (result) async {
-                emit(
-                  LoadedPromtState(
-                    promts: (state as LoadedPromtState).promts,
-                    chipController: _chipController,
-                    randomProgress: RandomProgress.onFinished,
-                    result: (state as LoadedPromtState).promts.elementAt(result),
-                  ),
-                );
-
-                await Future.delayed(const Duration(seconds: 1));
-                add(const RestoreSelectingPromtEvent());
-              },
-            );
-          }
-
-          break;
-
-        case RandomProgress.onProgress:
-          removeCheck = true;
           emit(
             LoadedPromtState(
-              promts: (state as LoadedPromtState).promts,
-              chipController: _chipController,
+              progress: Progress.active,
+              promts: qState.promts,
+              buttonFadeController: qState.buttonFadeController,
             ),
           );
 
-          add(const RestoreSelectingPromtEvent());
-          break;
+          /// Start randomizing animations
+          await _doRandomHiding(
+            qState,
+            (int result) async {
+              emit(
+                LoadedPromtState(
+                  progress: Progress.done,
+                  randomPromt: qState.promts.elementAt(result),
+                  promts: qState.promts,
+                  buttonFadeController: qState.buttonFadeController,
+                ),
+              );
 
-        case RandomProgress.onFinished:
-          break;
-      }
+              /// Restore all [Promt] chips on background
+              await Future.delayed(const Duration(seconds: 1), () {
+                add(const RestoreSelectingPromtEvent());
+              });
+            },
+          );
+        }
+        break;
+
+      case Progress.active:
+        _removeCheck = true;
+
+        emit(
+          LoadedPromtState(
+            promts: qState.promts,
+            buttonFadeController: qState.buttonFadeController,
+          ),
+        );
+
+        add(const RestoreSelectingPromtEvent());
+        break;
+
+      case Progress.done:
+        break;
     }
-  }
-
-  bool removeCheck = false;
-
-  FutureOr<void> startRandomRemoving(
-    LoadedPromtState state,
-    void Function(int) onFinished,
-  ) async {
-    final int finalResult = Random().nextInt(state.promts.length);
-    final rnd = <int>[];
-
-    for (int i = 0; i < state.promts.length - 1; i++) {
-      if (removeCheck) break;
-
-      //! First Half of entered Duraion
-
-      final animationDuration = services<DurationBloc>().state;
-      await Future.delayed(Duration(milliseconds: animationDuration.inMilliseconds ~/ 2));
-
-      //! --
-
-      int random;
-
-      do {
-        random = Random().nextInt(state.promts.length);
-      } while (rnd.contains(random) || random == finalResult);
-
-      rnd.add(random);
-
-      final controller = state.promts.elementAt(random).controller;
-      controller.add(false);
-
-      //! Second Half of entered Duraion
-
-      await Future.delayed(Duration(milliseconds: animationDuration.inMilliseconds ~/ 2));
-
-      //! --
-    }
-
-    if (removeCheck) return;
-
-    await Future.delayed(
-      const Duration(seconds: 1),
-    );
-
-    onFinished(finalResult);
   }
 }

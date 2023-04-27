@@ -3,54 +3,84 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:rundolist/src/presentation/app.dart';
-import 'package:rundolist/src/presentation/widgets/snacks/duration_snack_bar.dart';
+import 'package:rundolist/core/usecase/usecase.dart';
+import 'package:rundolist/src/domain/usecases/restore_duration_usecase.dart';
+import 'package:rundolist/src/presentation/widgets/snack_bars/empty_duration_error_snack_bar.dart';
+import 'package:rundolist/src/presentation/widgets/snack_bars/nagative_duration_error_snack_bar.dart';
+import 'package:rundolist/utils/global_context_mixin.dart';
 
 part 'duration_event.dart';
 
-class DurationBloc extends Bloc<DurationEvent, Duration> {
+/// Control removal duration [Bloc]
+class DurationBloc extends Bloc<DurationEvent, Duration> with GlobalContextUtil {
+  /// Default [Duration] for [DurationBloc]
+  static const Duration defaultDuration = Duration(seconds: 1);
+
+  /// [DurationBloc] constructor that handles all [Bloc] events
   DurationBloc() : super(Duration.zero) {
     on<InitDurationEvent>(_onInitDurationEvent);
     on<ChangeDurationEvent>(_onChangeDurationEvent);
+
+    /// Call initial event on load application
+    add(const InitDurationEvent());
   }
 
-  FutureOr<void> _onInitDurationEvent(
-    InitDurationEvent event,
+  /// Emit new [Duration] with negative time check
+  FutureOr<void> emitDuration(
+    Duration duration,
     Emitter<Duration> emit,
   ) {
-    //TODO: Implement from-cache restorin`
+    if (duration.isNegative) {
+      debugPrint('Duration should be positive');
+      emit(defaultDuration);
+      return null;
+    }
 
-    emit(const Duration(seconds: 1));
+    emit(duration);
   }
 
+  //! EVENT HANDLERS
+
+  /// [DurationBloc] method that handles [InitDurationEvent]
+  Future<FutureOr<void>> _onInitDurationEvent(
+    InitDurationEvent event,
+    Emitter<Duration> emit,
+  ) async {
+    final durationOrError = await RestoreDurationUseCase().call(
+      const NoParam(),
+    );
+
+    durationOrError.fold(
+      (error) {
+        emitDuration(
+          defaultDuration,
+          emit,
+        );
+      },
+      (value) {
+        emit(value);
+      },
+    );
+  }
+
+  /// [DurationBloc] method that handles [ChangeDurationEvent]
   FutureOr<void> _onChangeDurationEvent(
     ChangeDurationEvent event,
     Emitter<Duration> emit,
   ) {
-    try {
-      //! Global SnackBar Message
+    if (event.value == null) {
+      showGlobalSnackBar(EmptyDurationErrorSnackBar(context!));
+    } else if (event.value != null && (event.value ?? 0) < 0) {
+      showGlobalSnackBar(NegativeDurationErrorSnackBar(context!));
+    } else {
+      final Duration duration = Duration(
+        seconds: event.value?.toInt() ?? defaultDuration.inSeconds,
+      );
 
-      final ctx = App.globalNavKey.currentContext;
-
-      if (ctx != null) {
-        if (event.value == null) {
-          ScaffoldMessenger.of(ctx).showSnackBar(
-            DuraionSnackBar(ctx, DuraionSnackBarOption.empty),
-          );
-        } else if (event.value != null && (event.value ?? 0) < 0) {
-          ScaffoldMessenger.of(ctx).showSnackBar(
-            DuraionSnackBar(ctx, DuraionSnackBarOption.negative),
-          );
-        } else {
-          //TODO: Implement to-cache savin`
-
-          emit(Duration(seconds: event.value!.toInt()));
-        }
-      }
-
-      //! --
-    } on FormatException {
-      debugPrint('FormatException');
+      emitDuration(
+        duration,
+        emit,
+      );
     }
   }
 }
