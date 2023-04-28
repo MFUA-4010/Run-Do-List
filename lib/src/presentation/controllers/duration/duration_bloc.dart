@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 import 'package:rundolist/core/usecase/usecase.dart';
 import 'package:rundolist/src/domain/usecases/restore_duration_usecase.dart';
 import 'package:rundolist/src/domain/usecases/update_duration_usecase.dart';
@@ -18,7 +17,7 @@ class DurationBloc extends Bloc<DurationEvent, Duration> with GlobalContextUtil 
   static const Duration defaultDuration = Duration(seconds: 1);
 
   /// [DurationBloc] constructor that handles all [Bloc] events
-  DurationBloc() : super(Duration.zero) {
+  DurationBloc() : super(defaultDuration) {
     on<InitDurationEvent>(_onInitDurationEvent);
     on<ChangeDurationEvent>(_onChangeDurationEvent);
 
@@ -32,7 +31,6 @@ class DurationBloc extends Bloc<DurationEvent, Duration> with GlobalContextUtil 
     Emitter<Duration> emit,
   ) {
     if (duration.isNegative) {
-      debugPrint('Duration should be positive');
       emit(defaultDuration);
       return null;
     }

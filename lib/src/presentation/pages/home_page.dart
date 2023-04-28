@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rundolist/src/domain/entities/enums/progress.dart';
 import 'package:rundolist/src/domain/entities/promt.dart';
+import 'package:rundolist/src/presentation/controllers/counter/counter_bloc.dart';
 import 'package:rundolist/src/presentation/controllers/duration/duration_bloc.dart';
 import 'package:rundolist/src/presentation/controllers/promt/promt_bloc.dart';
 import 'package:rundolist/src/presentation/pages/result_page.dart';
 import 'package:rundolist/src/presentation/widgets/chips/add_chip.dart';
 import 'package:rundolist/src/presentation/widgets/chips/promt_chip.dart';
+import 'package:rundolist/src/presentation/widgets/dialogs/change_count_dialog.dart';
 import 'package:rundolist/src/presentation/widgets/dialogs/change_time_dialog.dart';
 import 'package:rundolist/src/presentation/widgets/dialogs/new_promt_dialog.dart';
 
@@ -59,14 +61,14 @@ class _AppBar extends AppBar {
               ),
             ],
           ),
-          actions: [
-            IconButton(
-              onPressed: onUploadPressed,
-              icon: const Icon(
-                Icons.upload_rounded,
-              ),
-            ),
-          ],
+          // actions: [
+          //   IconButton(
+          //     onPressed: onUploadPressed,
+          //     icon: const Icon(
+          //       Icons.upload_rounded,
+          //     ),
+          //   ),
+          // ],
         );
 }
 
@@ -100,7 +102,7 @@ class _Content extends StatelessWidget {
           if (state.progress == Progress.done) {
             Navigator.of(context).pushNamed(
               ResultPage.route,
-              arguments: state.randomPromt,
+              arguments: state.resultPromts,
             );
           }
         }
@@ -157,12 +159,23 @@ class _Footer extends StatelessWidget {
     Future<void> onTimeChangePressed() async {
       final duration = await showDialog<num>(
         context: context,
-        builder: (_) => const ChangeTimeDialog(),
+        builder: (_) => ChangeTimeDialog(),
       );
 
       // ignore: use_build_context_synchronously
       final durationBloc = BlocProvider.of<DurationBloc>(context);
       durationBloc.add(ChangeDurationEvent(duration));
+    }
+
+    Future<void> onCountChangePressed() async {
+      final count = await showDialog<num>(
+        context: context,
+        builder: (_) => ChangeCountDialog(),
+      );
+
+      // ignore: use_build_context_synchronously
+      final counterBloc = BlocProvider.of<CounterBloc>(context);
+      counterBloc.add(ChangeCounterEvent(count));
     }
 
     return ConstrainedBox(
@@ -208,6 +221,15 @@ class _Footer extends StatelessWidget {
                               style: Theme.of(context).textTheme.bodyLarge,
                             );
                           },
+                        ),
+                      ),
+                    ),
+                    Visibility(
+                      visible: state.progress == Progress.inactive,
+                      child: IconButton(
+                        onPressed: onCountChangePressed,
+                        icon: const Icon(
+                          Icons.co2_outlined,
                         ),
                       ),
                     ),

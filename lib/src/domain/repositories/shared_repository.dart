@@ -7,4 +7,7 @@ abstract class SharedRepository {
 
   Future<Either<Error, List<Promt>>> readPromts();
   Future<Either<Error, Unit>> updatePromts(List<Promt> promts);
+
+  Future<Either<Error, int>> readCounter();
+  Future<Either<Error, Unit>> updateCounter(int count);
 }
