@@ -9,6 +9,7 @@ import 'package:rundolist/src/domain/entities/enums/fade.dart';
 import 'package:rundolist/src/domain/entities/enums/progress.dart';
 import 'package:rundolist/src/domain/entities/promt.dart';
 import 'package:rundolist/src/domain/usecases/restore_cached_promts_usecase.dart';
+import 'package:rundolist/src/domain/usecases/update_cacahed_promts_usecase.dart';
 import 'package:rundolist/src/presentation/controllers/duration/duration_bloc.dart';
 import 'package:rundolist/src/presentation/widgets/dialogs/change_promt_dialog.dart';
 import 'package:rundolist/src/presentation/widgets/snack_bars/empty_promt_error_snack_bar.dart';
@@ -101,10 +102,10 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextUtil {
     ReloadPromtEvent event,
     Emitter<PromtState> emit,
   ) async {
-    final dataOrError = await RestoreCachedPromtsUseCase().call(const NoParam());
-
     /// New fade [StreamController] for 'add promt' button
     final StreamController<Fade> fadeController = StreamController<Fade>();
+
+    final dataOrError = await RestoreCachedPromtsUseCase().call(const NoParam());
 
     dataOrError.fold(
       (error) {
@@ -116,10 +117,9 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextUtil {
         );
       },
       (data) {
-        //TODO: implement cache restorin'
         emit(
           LoadedPromtState(
-            promts: const [],
+            promts: data,
             buttonFadeController: fadeController,
           ),
         );
@@ -168,6 +168,9 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextUtil {
         buttonFadeController: qState.buttonFadeController,
       ),
     );
+
+    /// Update promts in application cache
+    UpdateCachedPromtsUseCase().call(promts);
   }
 
   /// Store currently editing [Promt] id on [ProntState]
@@ -251,6 +254,9 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextUtil {
             buttonFadeController: qState.buttonFadeController,
           ),
         );
+
+        /// Update promts in application cache
+        UpdateCachedPromtsUseCase().call(promts);
       },
     );
 
@@ -285,6 +291,9 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextUtil {
         randomPromt: qState.randomPromt,
       ),
     );
+
+    /// Update promts in application cache
+    UpdateCachedPromtsUseCase().call(promts);
   }
 
   /// [PromtBloc] method that handles [RestoreSelectingPromtEvent]
