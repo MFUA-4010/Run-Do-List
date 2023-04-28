@@ -61,14 +61,14 @@ class _AppBar extends AppBar {
               ),
             ],
           ),
-          actions: [
-            IconButton(
-              onPressed: onUploadPressed,
-              icon: const Icon(
-                Icons.upload_rounded,
-              ),
-            ),
-          ],
+          // actions: [
+          //   IconButton(
+          //     onPressed: onUploadPressed,
+          //     icon: const Icon(
+          //       Icons.upload_rounded,
+          //     ),
+          //   ),
+          // ],
         );
 }
 
