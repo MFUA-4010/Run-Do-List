@@ -12,7 +12,7 @@ class RestoreCachedPromtsUseCase extends UseCase<List<Promt>, NoParam> {
   }
 
   @override
-  Future<Either<Error, List<Promt>>> call(NoParam param) async {
+  Future<Either<Error, List<Promt>>> call(NoParam param) {
     return _repository.readPromts();
   }
 }

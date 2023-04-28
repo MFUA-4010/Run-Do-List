@@ -44,8 +44,8 @@ class RemovePromtEvent extends PromtEvent {
   List<Object> get props => [id];
 }
 
-class RestoreSelectingPromtEvent extends PromtEvent {
-  const RestoreSelectingPromtEvent();
+class RestoreFadePromtEvent extends PromtEvent {
+  const RestoreFadePromtEvent();
 }
 
 class DoRandomPromtEvent extends PromtEvent {

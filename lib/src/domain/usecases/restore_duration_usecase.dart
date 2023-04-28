@@ -11,7 +11,7 @@ class RestoreDurationUseCase extends UseCase<Duration, NoParam> {
   }
 
   @override
-  Future<Either<Error, Duration>> call(NoParam param) async {
+  Future<Either<Error, Duration>> call(NoParam param) {
     return _repository.readDuration();
   }
 }

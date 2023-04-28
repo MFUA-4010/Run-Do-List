@@ -27,7 +27,7 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextUtil {
     on<AddPromtEvent>(_onAddPromtEvent);
     on<SelectPromtEvent>(_onSelectPromtEvent);
     on<RemovePromtEvent>(_onRemovePromtEvent);
-    on<RestoreSelectingPromtEvent>(_onRestoreSelectingPromtEvent);
+    on<RestoreFadePromtEvent>(_onRestoreFadePromtEvent);
     on<DoRandomPromtEvent>(_onDoRandomPromtEvent);
 
     /// Call initial event on load application
@@ -296,9 +296,9 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextUtil {
     UpdateCachedPromtsUseCase().call(promts);
   }
 
-  /// [PromtBloc] method that handles [RestoreSelectingPromtEvent]
-  Future<FutureOr<void>> _onRestoreSelectingPromtEvent(
-    RestoreSelectingPromtEvent event,
+  /// [PromtBloc] method that handles [RestoreFadePromtEvent]
+  Future<FutureOr<void>> _onRestoreFadePromtEvent(
+    RestoreFadePromtEvent event,
     Emitter<PromtState> emit,
   ) async {
     if (state is! LoadedPromtState) {
@@ -307,15 +307,21 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextUtil {
 
     final LoadedPromtState qState = state as LoadedPromtState;
 
-    //! Random removing duration animation fix
-    final animationDuration = services<DurationBloc>().state;
-    await Future.delayed(animationDuration);
-
     /// Restore hided elements
     qState.buttonFadeController.add(Fade.show);
     for (final Promt el in qState.promts) {
       el.fadeController.add(Fade.show);
     }
+
+    //! Random removing duration animation fix repeat
+    final animationDuration = services<DurationBloc>().state;
+    await Future.delayed(animationDuration);
+
+    qState.buttonFadeController.add(Fade.show);
+    for (final Promt el in qState.promts) {
+      el.fadeController.add(Fade.show);
+    }
+    //!
 
     emit(
       LoadedPromtState(
@@ -372,7 +378,7 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextUtil {
 
               /// Restore all [Promt] chips on background
               await Future.delayed(const Duration(seconds: 1), () {
-                add(const RestoreSelectingPromtEvent());
+                add(const RestoreFadePromtEvent());
               });
             },
           );
@@ -389,7 +395,7 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextUtil {
           ),
         );
 
-        add(const RestoreSelectingPromtEvent());
+        add(const RestoreFadePromtEvent());
         break;
 
       case Progress.done:
