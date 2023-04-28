@@ -26,6 +26,8 @@ class App extends StatelessWidget with GlobalContextUtil {
     return BlocBuilder<ThemeBloc, ThemeMode>(
       bloc: themeBloc,
       builder: (context, state) {
+        print(state);
+
         return MaterialApp(
           title: appTitle,
           navigatorKey: key,

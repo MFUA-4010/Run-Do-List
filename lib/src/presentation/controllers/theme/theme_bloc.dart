@@ -47,6 +47,8 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeMode> {
       newThemeMode = ThemeMode.light;
     }
 
+    emit(newThemeMode);
+
     await UpdateCachedThemeUseCase().call(newThemeMode);
   }
 }
