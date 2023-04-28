@@ -8,6 +8,7 @@ environment:
 dependencies:
   bloc: ^8.1.1
   dartz: ^0.10.1
+  dotenv: ^4.1.0
   equatable: ^2.0.5
   flutter:
     sdk: flutter
