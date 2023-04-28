@@ -21,7 +21,6 @@ class SharedRepositoryImpl extends SharedRepository {
   Future<Either<Error, Duration>> readDuration() async {
     try {
       final int? duration = (await prefs).getInt(_sharedDuration);
-      print(duration);
 
       if (duration == null) {
         throw UnimplementedError();
@@ -36,8 +35,6 @@ class SharedRepositoryImpl extends SharedRepository {
   @override
   Future<Either<Error, Unit>> updateDuration(Duration duration) async {
     try {
-      print(duration.inSeconds);
-
       await (await prefs).setInt(_sharedDuration, duration.inSeconds);
       return const Right(unit);
     } catch (e) {
