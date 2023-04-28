@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:rundolist/core/injector/services.dart';
-import 'package:rundolist/src/presentation/controllers/duration/duration_bloc.dart';
+import 'package:rundolist/src/presentation/controllers/counter/counter_bloc.dart';
 
-class ChangeTimeDialog extends StatelessWidget {
+class ChangeCountDialog extends StatelessWidget {
   late final int currentCount;
 
-  ChangeTimeDialog({
-    super.key,
-  }) {
-    currentCount = services<DurationBloc>().state.inSeconds;
+  ChangeCountDialog({super.key}) {
+    currentCount = services<CounterBloc>().state;
   }
 
   @override
@@ -30,7 +28,7 @@ class ChangeTimeDialog extends StatelessWidget {
         ),
       ),
       title: Text(
-        'Change Remove Duration',
+        'Change Count of Random Promts',
         style: Theme.of(context).textTheme.titleLarge,
       ),
       content: Column(
@@ -47,7 +45,7 @@ class ChangeTimeDialog extends StatelessWidget {
                   ],
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    label: const Text('Enter time'),
+                    label: const Text('Count'),
                     labelStyle: Theme.of(context).textTheme.bodyMedium,
                     border: const OutlineInputBorder(
                       borderRadius: BorderRadius.all(
@@ -58,11 +56,11 @@ class ChangeTimeDialog extends StatelessWidget {
                   controller: controller,
                 ),
               ),
-              const SizedBox(width: 8.0),
-              Text(
-                'sec',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
+              // const SizedBox(width: 8.0),
+              // Text(
+              //   'sec',
+              //   style: Theme.of(context).textTheme.bodySmall,
+              // ),
             ],
           ),
           const SizedBox(height: 8.0),

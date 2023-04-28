@@ -9,6 +9,7 @@ import 'package:uuid/uuid.dart';
 
 class SharedRepositoryImpl extends SharedRepository {
   static const _sharedDuration = 'DURATION';
+  static const _sharedCounter = 'COUNTER';
   static const _sharedPromts = 'PROMTS';
 
   late final Future<SharedPreferences> prefs;
@@ -70,6 +71,31 @@ class SharedRepositoryImpl extends SharedRepository {
   Future<Either<Error, Unit>> updatePromts(List<Promt> promts) async {
     try {
       await (await prefs).setStringList(_sharedPromts, promts.map((e) => e.data).toList());
+      return const Right(unit);
+    } catch (e) {
+      return Left(UnimplementedError());
+    }
+  }
+
+  @override
+  Future<Either<Error, int>> readCounter() async {
+    try {
+      final int? count = (await prefs).getInt(_sharedCounter);
+
+      if (count == null) {
+        throw UnimplementedError();
+      }
+
+      return Right(count);
+    } catch (e) {
+      return Left(UnimplementedError());
+    }
+  }
+
+  @override
+  Future<Either<Error, Unit>> updateCounter(int count) async {
+    try {
+      await (await prefs).setInt(_sharedCounter, count);
       return const Right(unit);
     } catch (e) {
       return Left(UnimplementedError());

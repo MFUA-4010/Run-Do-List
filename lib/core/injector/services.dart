@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:get_it/get_it.dart';
 import 'package:rundolist/src/data/implements/shared_repository_impl.dart';
 import 'package:rundolist/src/domain/repositories/shared_repository.dart';
+import 'package:rundolist/src/presentation/controllers/counter/counter_bloc.dart';
 import 'package:rundolist/src/presentation/controllers/duration/duration_bloc.dart';
 import 'package:rundolist/src/presentation/controllers/promt/promt_bloc.dart';
 
@@ -18,6 +19,10 @@ FutureOr<void> initServices() async {
   );
 
   //! Register Global BLoC's
+
+  services.registerLazySingleton<CounterBloc>(
+    () => CounterBloc(),
+  );
 
   services.registerLazySingleton<DurationBloc>(
     () => DurationBloc(),

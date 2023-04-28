@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rundolist/core/injector/services.dart';
 import 'package:rundolist/src/domain/entities/promt.dart';
 import 'package:rundolist/src/presentation/color_schemes.g.dart';
+import 'package:rundolist/src/presentation/controllers/counter/counter_bloc.dart';
 import 'package:rundolist/src/presentation/controllers/duration/duration_bloc.dart';
 import 'package:rundolist/src/presentation/controllers/promt/promt_bloc.dart';
 import 'package:rundolist/src/presentation/pages/forbidden_page.dart';
@@ -39,6 +40,9 @@ class App extends StatelessWidget with GlobalContextUtil {
                 ),
                 BlocProvider(
                   create: (context) => services<DurationBloc>(),
+                ),
+                BlocProvider(
+                  create: (context) => services<CounterBloc>(),
                 ),
               ],
               child: const HomePage(),

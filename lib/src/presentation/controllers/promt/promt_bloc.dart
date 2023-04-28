@@ -10,6 +10,7 @@ import 'package:rundolist/src/domain/entities/enums/progress.dart';
 import 'package:rundolist/src/domain/entities/promt.dart';
 import 'package:rundolist/src/domain/usecases/restore_cached_promts_usecase.dart';
 import 'package:rundolist/src/domain/usecases/update_cacahed_promts_usecase.dart';
+import 'package:rundolist/src/presentation/controllers/counter/counter_bloc.dart';
 import 'package:rundolist/src/presentation/controllers/duration/duration_bloc.dart';
 import 'package:rundolist/src/presentation/widgets/dialogs/change_promt_dialog.dart';
 import 'package:rundolist/src/presentation/widgets/snack_bars/empty_promt_error_snack_bar.dart';
@@ -48,7 +49,9 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextUtil {
     /// Storing elements that have been fade
     final hidedPromts = <int>[];
 
-    for (int i = 0; i < state.promts.length - 1; i++) {
+    final finalResultsCount = services<CounterBloc>().state;
+
+    for (int i = 0; i < state.promts.length - finalResultsCount; i++) {
       /// Stop [_randomFadePromts] method if [_removeCheck] before animation
       if (_removeCheck) break;
 
