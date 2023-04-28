@@ -7,7 +7,7 @@ import 'package:rundolist/src/domain/repositories/shared_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
-class SharedRepositoryImpl extends SharedRepository {
+class SharedRepositoryImpl implements SharedRepository {
   static const _sharedDuration = 'DURATION';
   static const _sharedPromts = 'PROMTS';
 
