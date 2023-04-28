@@ -5,6 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:rundolist/core/usecase/usecase.dart';
 import 'package:rundolist/src/domain/usecases/restore_duration_usecase.dart';
+import 'package:rundolist/src/domain/usecases/update_duration_usecase.dart';
 import 'package:rundolist/src/presentation/widgets/snack_bars/empty_duration_error_snack_bar.dart';
 import 'package:rundolist/src/presentation/widgets/snack_bars/nagative_duration_error_snack_bar.dart';
 import 'package:rundolist/utils/global_context_mixin.dart';
@@ -64,10 +65,10 @@ class DurationBloc extends Bloc<DurationEvent, Duration> with GlobalContextUtil 
   }
 
   /// [DurationBloc] method that handles [ChangeDurationEvent]
-  FutureOr<void> _onChangeDurationEvent(
+  Future<FutureOr<void>> _onChangeDurationEvent(
     ChangeDurationEvent event,
     Emitter<Duration> emit,
-  ) {
+  ) async {
     if (event.value == null) {
       showGlobalSnackBar(EmptyDurationErrorSnackBar(context!));
     } else if (event.value != null && (event.value ?? 0) < 0) {
@@ -81,6 +82,8 @@ class DurationBloc extends Bloc<DurationEvent, Duration> with GlobalContextUtil 
         duration,
         emit,
       );
+
+      await UpdateDurationUseCase().call(duration);
     }
   }
 }

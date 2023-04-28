@@ -21,6 +21,7 @@ class SharedRepositoryImpl extends SharedRepository {
   Future<Either<Error, Duration>> readDuration() async {
     try {
       final int? duration = (await prefs).getInt(_sharedDuration);
+      print(duration);
 
       if (duration == null) {
         throw UnimplementedError();
@@ -34,14 +35,20 @@ class SharedRepositoryImpl extends SharedRepository {
 
   @override
   Future<Either<Error, Unit>> updateDuration(Duration duration) async {
-    // TODO: implement updateDuration
-    throw UnimplementedError();
+    try {
+      print(duration.inSeconds);
+
+      await (await prefs).setInt(_sharedDuration, duration.inSeconds);
+      return const Right(unit);
+    } catch (e) {
+      return Left(UnimplementedError());
+    }
   }
 
   @override
   Future<Either<Error, List<Promt>>> readPromts() async {
     try {
-      final List<String>? promts = (await prefs).getStringList(_sharedDuration);
+      final List<String>? promts = (await prefs).getStringList(_sharedPromts);
 
       if (promts?.isEmpty ?? false) {
         throw UnimplementedError();
@@ -64,7 +71,11 @@ class SharedRepositoryImpl extends SharedRepository {
 
   @override
   Future<Either<Error, Unit>> updatePromts(List<Promt> promts) async {
-    // TODO: implement updatePromts
-    throw UnimplementedError();
+    try {
+      await (await prefs).setStringList(_sharedPromts, promts.map((e) => e.data).toList());
+      return const Right(unit);
+    } catch (e) {
+      return Left(UnimplementedError());
+    }
   }
 }

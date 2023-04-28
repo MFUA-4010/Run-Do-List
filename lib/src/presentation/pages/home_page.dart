@@ -5,12 +5,10 @@ import 'package:rundolist/src/domain/entities/promt.dart';
 import 'package:rundolist/src/presentation/controllers/duration/duration_bloc.dart';
 import 'package:rundolist/src/presentation/controllers/promt/promt_bloc.dart';
 import 'package:rundolist/src/presentation/pages/result_page.dart';
-import 'package:rundolist/src/presentation/widgets/add_chip.dart';
 import 'package:rundolist/src/presentation/widgets/chips/add_chip.dart';
 import 'package:rundolist/src/presentation/widgets/chips/promt_chip.dart';
 import 'package:rundolist/src/presentation/widgets/dialogs/change_time_dialog.dart';
 import 'package:rundolist/src/presentation/widgets/dialogs/new_promt_dialog.dart';
-import 'package:rundolist/src/presentation/widgets/promt_chip.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});

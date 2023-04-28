@@ -4,15 +4,15 @@ import 'package:rundolist/core/usecase/usecase.dart';
 import 'package:rundolist/src/domain/entities/promt.dart';
 import 'package:rundolist/src/domain/repositories/shared_repository.dart';
 
-class RestoreCachedPromtsUseCase extends UseCase<List<Promt>, NoParam> {
+class UpdateCachedPromtsUseCase extends UseCase<Unit, List<Promt>> {
   late final SharedRepository _repository;
 
-  RestoreCachedPromtsUseCase() {
+  UpdateCachedPromtsUseCase() {
     _repository = services<SharedRepository>();
   }
 
   @override
-  Future<Either<Error, List<Promt>>> call(NoParam param) {
-    return _repository.readPromts();
+  Future<Either<Error, Unit>> call(List<Promt> param) {
+    return _repository.updatePromts(param);
   }
 }
