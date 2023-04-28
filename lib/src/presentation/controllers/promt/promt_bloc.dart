@@ -287,11 +287,18 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextUtil {
 
     final LoadedPromtState qState = state as LoadedPromtState;
 
-    // New [Promt] Storage
-    final promts = <Promt>[];
-    promts.addAll((state as LoadedPromtState).promts);
+    final counterBloc = services<CounterBloc>();
 
-    // Write changes
+    ///
+    if (counterBloc.state < qState.promts.length - 1) {
+      counterBloc.add(ChangeCounterEvent(qState.promts.length - 1));
+    }
+
+    /// New [Promt] Storage
+    final promts = <Promt>[];
+    promts.addAll(qState.promts);
+
+    /// Write changes
     promts.removeWhere((element) => element.id == event.id);
 
     emit(
