@@ -102,7 +102,7 @@ class _Content extends StatelessWidget {
           if (state.progress == Progress.done) {
             Navigator.of(context).pushNamed(
               ResultPage.route,
-              arguments: state.randomPromt,
+              arguments: state.resultPromts,
             );
           }
         }

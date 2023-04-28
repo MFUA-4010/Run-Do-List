@@ -13,7 +13,7 @@ class AppSnackBar extends SnackBar with GlobalContextUtil {
                 ),
           ),
           backgroundColor: Theme.of(context).colorScheme.error,
-          duration: const Duration(milliseconds: 800),
+          duration: const Duration(milliseconds: 1400),
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(4.0),

@@ -19,7 +19,7 @@ class LoadedPromtState extends PromtState {
 
   final bool reloadFlag;
 
-  final Promt? randomPromt;
+  final List<Promt>? resultPromts;
   final List<Promt> promts;
 
   final StreamController<Fade> buttonFadeController;
@@ -27,7 +27,7 @@ class LoadedPromtState extends PromtState {
   const LoadedPromtState({
     this.progress = Progress.inactive,
     this.reloadFlag = false,
-    this.randomPromt,
+    this.resultPromts,
     required this.promts,
     required this.buttonFadeController,
   });

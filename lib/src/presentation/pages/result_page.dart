@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:rundolist/src/domain/entities/promt.dart';
 
 class ResultPage extends StatelessWidget {
-  final Promt promt;
+  final List<Promt> promt;
 
   const ResultPage(
     this.promt, {
@@ -26,23 +26,33 @@ class ResultPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                'Result Promt',
+                'Result',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
             Center(
-              child: Chip(
-                label: Hero(
-                  tag: promt.id,
-                  child: Text(
-                    promt.data,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                ),
-                side: BorderSide(
-                  color: Theme.of(context).primaryColor,
-                  width: .50,
-                ),
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                runAlignment: WrapAlignment.center,
+                spacing: 4.0,
+                runSpacing: 4.0,
+                children: promt.map(
+                  (e) {
+                    return Chip(
+                      label: Hero(
+                        tag: e.id,
+                        child: Text(
+                          e.data,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                      ),
+                      side: BorderSide(
+                        color: Theme.of(context).primaryColor,
+                        width: .50,
+                      ),
+                    );
+                  },
+                ).toList(),
               ),
             ),
           ],

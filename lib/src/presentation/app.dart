@@ -52,9 +52,9 @@ class App extends StatelessWidget with GlobalContextUtil {
             return const ForbiddenPage();
 
           case ResultPage.route:
-            if (settings.arguments != null && settings.arguments is Promt) {
+            if (settings.arguments != null && settings.arguments is List<Promt>) {
               // ignore: cast_nullable_to_non_nullable
-              return ResultPage(settings.arguments as Promt);
+              return ResultPage(settings.arguments as List<Promt>);
             }
 
             return const ForbiddenPage();

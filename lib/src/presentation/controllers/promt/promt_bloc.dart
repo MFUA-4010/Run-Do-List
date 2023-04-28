@@ -41,15 +41,27 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextUtil {
   /// Method for randomize hide promts from [LoadedPromtState]
   FutureOr<void> _doRandomHiding(
     LoadedPromtState state,
-    void Function(int) onFinished,
+    void Function(List<int>) onFinished,
   ) async {
-    /// Prepare final random element index
-    final int finalResult = Random().nextInt(state.promts.length);
+    final finalResultsCount = services<CounterBloc>().state;
+
+    // /// Prepare final random element index
+    // final int finalResult = Random().nextInt(state.promts.length);
+
+    /// Next element index that will be fade
+    int nextRandom;
+
+    final List<int> finalResults = <int>[];
+
+    for (int i = 0; i < finalResultsCount; i++) {
+      do {
+        nextRandom = Random().nextInt(state.promts.length);
+      } while (finalResults.contains(nextRandom));
+      finalResults.add(nextRandom);
+    }
 
     /// Storing elements that have been fade
-    final hidedPromts = <int>[];
-
-    final finalResultsCount = services<CounterBloc>().state;
+    final List<int> hidedPromts = <int>[];
 
     for (int i = 0; i < state.promts.length - finalResultsCount; i++) {
       /// Stop [_randomFadePromts] method if [_removeCheck] before animation
@@ -60,13 +72,10 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextUtil {
       await Future.delayed(Duration(milliseconds: animationDuration.inMilliseconds ~/ 2));
       /////
 
-      /// Next element index that will be fade
-      int nextRandom;
-
       /// Re-roll next element index if one `s already in fade
       do {
         nextRandom = Random().nextInt(state.promts.length);
-      } while (hidedPromts.contains(nextRandom) || nextRandom == finalResult);
+      } while (hidedPromts.contains(nextRandom) || finalResults.contains(nextRandom));
 
       /// Store generated [nextRandom] for calc next generations
       hidedPromts.add(nextRandom);
@@ -95,7 +104,7 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextUtil {
     );
 
     /// Return pseudo result
-    onFinished(finalResult);
+    onFinished(finalResults);
   }
 
 //! HANDLERS
@@ -215,7 +224,7 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextUtil {
     emit(
       LoadedPromtState(
         progress: qState.progress,
-        randomPromt: qState.randomPromt,
+        resultPromts: qState.resultPromts,
         promts: qState.promts,
         buttonFadeController: qState.buttonFadeController,
       ),
@@ -252,7 +261,7 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextUtil {
           LoadedPromtState(
             progress: qState.progress,
             reloadFlag: true,
-            randomPromt: qState.randomPromt,
+            resultPromts: qState.resultPromts,
             promts: promts,
             buttonFadeController: qState.buttonFadeController,
           ),
@@ -291,7 +300,7 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextUtil {
         reloadFlag: true,
         progress: qState.progress,
         promts: promts,
-        randomPromt: qState.randomPromt,
+        resultPromts: qState.resultPromts,
       ),
     );
 
@@ -328,7 +337,7 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextUtil {
 
     emit(
       LoadedPromtState(
-        randomPromt: qState.randomPromt,
+        resultPromts: qState.resultPromts,
         promts: qState.promts,
         buttonFadeController: qState.buttonFadeController,
       ),
@@ -369,11 +378,13 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextUtil {
           /// Start randomizing animations
           await _doRandomHiding(
             qState,
-            (int result) async {
+            (List<int> results) async {
               emit(
                 LoadedPromtState(
                   progress: Progress.done,
-                  randomPromt: qState.promts.elementAt(result),
+                  resultPromts: results.map((i) {
+                    return qState.promts.elementAt(i);
+                  }).toList(),
                   promts: qState.promts,
                   buttonFadeController: qState.buttonFadeController,
                 ),
