@@ -12,7 +12,7 @@ import 'package:rundolist/utils/global_context_mixin.dart';
 part 'duration_event.dart';
 
 /// Control removal duration [Bloc]
-class DurationBloc extends Bloc<DurationEvent, Duration> with GlobalContextUtil {
+class DurationBloc extends Bloc<DurationEvent, Duration> with GlobalContextMixin {
   /// Default [Duration] for [DurationBloc]
   static const Duration defaultDuration = Duration(seconds: 1);
 

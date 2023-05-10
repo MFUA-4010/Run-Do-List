@@ -1,9 +1,9 @@
 import 'package:dotenv/dotenv.dart';
 
-class GlobalEnvironment {
+class GlobalEnv {
   late final DotEnv env;
 
-  GlobalEnvironment() {
+  GlobalEnv() {
     env = DotEnv()..load(['.env']);
   }
 

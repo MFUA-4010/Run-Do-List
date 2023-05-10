@@ -13,6 +13,7 @@ class ChangeCountDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = TextEditingController();
+    final textTheme = Theme.of(context).textTheme;
 
     void onPressed() {
       Navigator.pop<num?>(
@@ -29,7 +30,7 @@ class ChangeCountDialog extends StatelessWidget {
       ),
       title: Text(
         'Change Count of Random Promts',
-        style: Theme.of(context).textTheme.titleLarge,
+        style: textTheme.titleLarge,
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -38,7 +39,7 @@ class ChangeCountDialog extends StatelessWidget {
             children: [
               Expanded(
                 child: TextField(
-                  style: Theme.of(context).textTheme.bodyMedium,
+                  style: textTheme.bodyMedium,
                   inputFormatters: <TextInputFormatter>[
                     FilteringTextInputFormatter.digitsOnly,
                     LengthLimitingTextInputFormatter(2),
@@ -46,7 +47,7 @@ class ChangeCountDialog extends StatelessWidget {
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     label: const Text('Count'),
-                    labelStyle: Theme.of(context).textTheme.bodyMedium,
+                    labelStyle: textTheme.bodyMedium,
                     border: const OutlineInputBorder(
                       borderRadius: BorderRadius.all(
                         Radius.circular(8.0),
@@ -56,17 +57,12 @@ class ChangeCountDialog extends StatelessWidget {
                   controller: controller,
                 ),
               ),
-              // const SizedBox(width: 8.0),
-              // Text(
-              //   'sec',
-              //   style: Theme.of(context).textTheme.bodySmall,
-              // ),
             ],
           ),
           const SizedBox(height: 8.0),
           Text(
             'Current value: $currentCount',
-            style: Theme.of(context).textTheme.bodySmall,
+            style: textTheme.bodySmall,
           ),
         ],
       ),

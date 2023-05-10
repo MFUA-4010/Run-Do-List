@@ -15,6 +15,7 @@ class ChangeTimeDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = TextEditingController();
+    final textTheme = Theme.of(context).textTheme;
 
     void onPressed() {
       Navigator.pop<num?>(
@@ -31,7 +32,7 @@ class ChangeTimeDialog extends StatelessWidget {
       ),
       title: Text(
         'Change Remove Duration',
-        style: Theme.of(context).textTheme.titleLarge,
+        style: textTheme.titleLarge,
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -40,7 +41,7 @@ class ChangeTimeDialog extends StatelessWidget {
             children: [
               Expanded(
                 child: TextField(
-                  style: Theme.of(context).textTheme.bodyMedium,
+                  style: textTheme.bodyMedium,
                   inputFormatters: <TextInputFormatter>[
                     FilteringTextInputFormatter.digitsOnly,
                     LengthLimitingTextInputFormatter(2),
@@ -48,7 +49,7 @@ class ChangeTimeDialog extends StatelessWidget {
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     label: const Text('Enter time'),
-                    labelStyle: Theme.of(context).textTheme.bodyMedium,
+                    labelStyle: textTheme.bodyMedium,
                     border: const OutlineInputBorder(
                       borderRadius: BorderRadius.all(
                         Radius.circular(8.0),
@@ -61,14 +62,14 @@ class ChangeTimeDialog extends StatelessWidget {
               const SizedBox(width: 8.0),
               Text(
                 'sec',
-                style: Theme.of(context).textTheme.bodySmall,
+                style: textTheme.bodySmall,
               ),
             ],
           ),
           const SizedBox(height: 8.0),
           Text(
             'Current value: $currentCount',
-            style: Theme.of(context).textTheme.bodySmall,
+            style: textTheme.bodySmall,
           ),
         ],
       ),
