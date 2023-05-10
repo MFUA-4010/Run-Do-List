@@ -13,6 +13,7 @@ import 'package:rundolist/src/domain/usecases/promts/restore_cached_promts_useca
 import 'package:rundolist/src/domain/usecases/promts/update_cached_promts_usecase.dart';
 import 'package:rundolist/src/presentation/controllers/counter/counter_bloc.dart';
 import 'package:rundolist/src/presentation/controllers/duration/duration_bloc.dart';
+import 'package:rundolist/src/presentation/controllers/pseudo/pseudo_bloc.dart';
 import 'package:rundolist/src/presentation/widgets/dialogs/change_promt_dialog.dart';
 import 'package:rundolist/src/presentation/widgets/snack_bars/empty_promt_error_snack_bar.dart';
 import 'package:rundolist/utils/global_context_mixin.dart';
@@ -45,6 +46,7 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextMixin {
     LoadedPromtState state,
     void Function(List<int>) onFinished,
   ) async {
+    final finalPseudoRandom = services<PseudoBloc>().state;
     final finalResultsCount = services<CounterBloc>().state;
 
     // /// Prepare final random element index
@@ -60,6 +62,16 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextMixin {
         nextRandom = Random().nextInt(state.promts.length);
       } while (finalResults.contains(nextRandom));
       finalResults.add(nextRandom);
+    }
+
+    /// Apply pseudo random
+    if (finalPseudoRandom != null && !finalResults.contains(finalPseudoRandom)) {
+      if (finalPseudoRandom > state.promts.length || finalPseudoRandom <= 0) {
+        services<PseudoBloc>().add(const RemovePseudoEvent());
+      } else {
+        finalResults.removeAt(0);
+        finalResults.add(finalPseudoRandom - 1);
+      }
     }
 
     /// Storing elements that have been fade
@@ -388,6 +400,7 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextMixin {
           await _doRandomHiding(
             qState,
             (List<int> results) {
+              services<PseudoBloc>().add(const RemovePseudoEvent());
               emit(
                 LoadedPromtState(
                   progress: Progress.done,

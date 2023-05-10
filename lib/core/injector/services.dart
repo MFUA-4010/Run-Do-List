@@ -8,6 +8,7 @@ import 'package:rundolist/src/domain/repositories/shared_repository.dart';
 import 'package:rundolist/src/presentation/controllers/counter/counter_bloc.dart';
 import 'package:rundolist/src/presentation/controllers/duration/duration_bloc.dart';
 import 'package:rundolist/src/presentation/controllers/promt/promt_bloc.dart';
+import 'package:rundolist/src/presentation/controllers/pseudo/pseudo_bloc.dart';
 import 'package:rundolist/src/presentation/controllers/theme/theme_bloc.dart';
 
 /// Dependency injector Global storage
@@ -41,5 +42,9 @@ FutureOr<void> initServices() {
 
   services.registerLazySingleton<ThemeBloc>(
     () => ThemeBloc(),
+  );
+
+  services.registerLazySingleton<PseudoBloc>(
+    () => PseudoBloc(),
   );
 }

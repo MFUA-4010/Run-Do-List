@@ -2,11 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rundolist/core/key_sets/key_sets.dart';
 import 'package:rundolist/src/domain/entities/enums/progress.dart';
 import 'package:rundolist/src/domain/entities/promt.dart';
 import 'package:rundolist/src/presentation/controllers/counter/counter_bloc.dart';
 import 'package:rundolist/src/presentation/controllers/duration/duration_bloc.dart';
 import 'package:rundolist/src/presentation/controllers/promt/promt_bloc.dart';
+import 'package:rundolist/src/presentation/controllers/pseudo/pseudo_bloc.dart';
 import 'package:rundolist/src/presentation/controllers/theme/theme_bloc.dart';
 import 'package:rundolist/src/presentation/pages/result_page.dart';
 import 'package:rundolist/src/presentation/widgets/chips/add_chip.dart';
@@ -22,6 +24,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pseudoBloc = BlocProvider.of<PseudoBloc>(context);
     final promtBloc = BlocProvider.of<PromtBloc>(context);
     final themeBloc = BlocProvider.of<ThemeBloc>(context);
 
@@ -29,21 +32,47 @@ class HomePage extends StatelessWidget {
       themeBloc.add(const ChangeThemeEvent());
     }
 
-    return Scaffold(
-      appBar: _AppBar(
-        context,
-        onThemeChangePressed: onThemeChangePressed,
-      ),
-      body: Container(
-        alignment: Alignment.center,
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Expanded(
-              child: _Content(promtBloc),
+    FutureOr<void> onCheatUse(String numStr) {
+      pseudoBloc.add(HandleCheatNumStrPseudoEvent(numStr));
+    }
+
+    FutureOr<void> onClearUse() {
+      pseudoBloc.add(const RemovePseudoEvent());
+    }
+
+    return Shortcuts(
+      shortcuts: KeySets.peudoRandomShortcuts,
+      child: Actions(
+        actions: KeySets.pseudoRandomActions(
+          // Pseudo Use
+          (numStr) {
+            onCheatUse(numStr);
+          },
+          // Pseudo Clear
+          () {
+            onClearUse();
+          },
+        ),
+        child: Focus(
+          autofocus: true,
+          child: Scaffold(
+            appBar: _AppBar(
+              context,
+              onThemeChangePressed: onThemeChangePressed,
             ),
-            _Footer(promtBloc),
-          ],
+            body: Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: _Content(promtBloc),
+                  ),
+                  _Footer(promtBloc),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -79,12 +108,6 @@ class _AppBar extends AppBar {
                 Icons.mode_night_rounded,
               ),
             ),
-            // IconButton(
-            //   onPressed: onUploadPressed,
-            //   icon: const Icon(
-            //     Icons.upload_rounded,
-            //   ),
-            // ),
           ],
         );
 }
