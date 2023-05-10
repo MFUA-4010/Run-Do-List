@@ -51,3 +51,7 @@ class RestoreFadePromtEvent extends PromtEvent {
 class DoRandomPromtEvent extends PromtEvent {
   const DoRandomPromtEvent();
 }
+
+class ClearPromtEvent extends PromtEvent {
+  const ClearPromtEvent();
+}

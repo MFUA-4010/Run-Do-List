@@ -8,10 +8,9 @@ import 'package:rundolist/core/usecase/usecase.dart';
 import 'package:rundolist/src/domain/entities/enums/fade.dart';
 import 'package:rundolist/src/domain/entities/enums/progress.dart';
 import 'package:rundolist/src/domain/entities/promt.dart';
+import 'package:rundolist/src/domain/usecases/promts/clear_cached_promts_usecase.dart';
 import 'package:rundolist/src/domain/usecases/promts/restore_cached_promts_usecase.dart';
-import 'package:rundolist/src/domain/usecases/promts/update_cacahed_promts_usecase.dart';
-import 'package:rundolist/src/domain/usecases/restore_cached_promts_usecase.dart';
-import 'package:rundolist/src/domain/usecases/update_cached_promts_usecase.dart';
+import 'package:rundolist/src/domain/usecases/promts/update_cached_promts_usecase.dart';
 import 'package:rundolist/src/presentation/controllers/counter/counter_bloc.dart';
 import 'package:rundolist/src/presentation/controllers/duration/duration_bloc.dart';
 import 'package:rundolist/src/presentation/widgets/dialogs/change_promt_dialog.dart';
@@ -32,6 +31,7 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextMixin {
     on<RemovePromtEvent>(_onRemovePromtEvent);
     on<RestoreFadePromtEvent>(_onRestoreFadePromtEvent);
     on<DoRandomPromtEvent>(_onDoRandomPromtEvent);
+    on<ClearPromtEvent>(_onClearPromtEvent);
 
     /// Call initial event on load application
     add(const ReloadPromtEvent());
@@ -424,5 +424,21 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextMixin {
       case Progress.done:
         break;
     }
+  }
+
+  Future<FutureOr<void>> _onClearPromtEvent(
+    ClearPromtEvent event,
+    Emitter<PromtState> emit,
+  ) async {
+    final LoadedPromtState qState = state as LoadedPromtState;
+
+    emit(
+      LoadedPromtState(
+        buttonFadeController: qState.buttonFadeController,
+        promts: const [],
+      ),
+    );
+
+    await ClearCachedPromtsUseCase().call(const NoParam());
   }
 }
