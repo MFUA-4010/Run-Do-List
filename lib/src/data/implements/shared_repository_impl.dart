@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dartz/dartz.dart';
+import 'package:flutter/material.dart';
 import 'package:rundolist/src/domain/entities/enums/fade.dart';
 import 'package:rundolist/src/domain/entities/promt.dart';
 import 'package:rundolist/src/domain/repositories/shared_repository.dart';
@@ -11,6 +12,7 @@ class SharedRepositoryImpl implements SharedRepository {
   static const _sharedDuration = 'DURATION';
   static const _sharedCounter = 'COUNTER';
   static const _sharedPromts = 'PROMTS';
+  static const _sharedTheme = 'THEME';
 
   late final Future<SharedPreferences> prefs;
 
@@ -110,6 +112,31 @@ class SharedRepositoryImpl implements SharedRepository {
     try {
       await (await prefs).setStringList(_sharedPromts, []);
 
+      return const Right(unit);
+    } catch (e) {
+      return Left(UnimplementedError());
+    }
+  }
+
+  @override
+  Future<Either<Error, ThemeMode>> readTheme() async {
+    try {
+      final int? index = (await prefs).getInt(_sharedTheme);
+
+      if (index == null) {
+        throw UnimplementedError();
+      }
+
+      return Right(ThemeMode.values.elementAt(index));
+    } catch (e) {
+      return Left(UnimplementedError());
+    }
+  }
+
+  @override
+  Future<Either<Error, Unit>> updateTheme(ThemeMode param) async {
+    try {
+      await (await prefs).setInt(_sharedTheme, param.index);
       return const Right(unit);
     } catch (e) {
       return Left(UnimplementedError());

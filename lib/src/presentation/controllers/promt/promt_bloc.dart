@@ -8,6 +8,8 @@ import 'package:rundolist/core/usecase/usecase.dart';
 import 'package:rundolist/src/domain/entities/enums/fade.dart';
 import 'package:rundolist/src/domain/entities/enums/progress.dart';
 import 'package:rundolist/src/domain/entities/promt.dart';
+import 'package:rundolist/src/domain/usecases/promts/restore_cached_promts_usecase.dart';
+import 'package:rundolist/src/domain/usecases/promts/update_cacahed_promts_usecase.dart';
 import 'package:rundolist/src/domain/usecases/restore_cached_promts_usecase.dart';
 import 'package:rundolist/src/domain/usecases/update_cached_promts_usecase.dart';
 import 'package:rundolist/src/presentation/controllers/counter/counter_bloc.dart';
