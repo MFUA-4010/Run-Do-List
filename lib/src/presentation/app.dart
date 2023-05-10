@@ -6,29 +6,41 @@ import 'package:rundolist/src/presentation/color_schemes.g.dart';
 import 'package:rundolist/src/presentation/controllers/counter/counter_bloc.dart';
 import 'package:rundolist/src/presentation/controllers/duration/duration_bloc.dart';
 import 'package:rundolist/src/presentation/controllers/promt/promt_bloc.dart';
+import 'package:rundolist/src/presentation/controllers/theme/theme_bloc.dart';
 import 'package:rundolist/src/presentation/pages/forbidden_page.dart';
 import 'package:rundolist/src/presentation/pages/home_page.dart';
 import 'package:rundolist/src/presentation/pages/result_page.dart';
 import 'package:rundolist/utils/global_context_mixin.dart';
 
-class App extends StatelessWidget with GlobalContextUtil {
+class App extends StatelessWidget with GlobalContextMixin {
   static const appTitle = 'Run Do List';
 
-  App({super.key});
+  late final ThemeBloc themeBloc;
+
+  App({super.key}) {
+    themeBloc = services<ThemeBloc>();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: appTitle,
-      navigatorKey: key,
-      theme: ThemeData(useMaterial3: true, colorScheme: lightColorScheme),
-      themeMode: ThemeMode.light,
-      debugShowCheckedModeBanner: false,
-      onGenerateRoute: _onGenerateRoute,
+    return BlocBuilder<ThemeBloc, ThemeMode>(
+      bloc: themeBloc,
+      builder: (context, state) {
+        print(state);
+
+        return MaterialApp(
+          title: appTitle,
+          navigatorKey: key,
+          onGenerateRoute: _onGenerateRoute,
+          theme: ThemeData(useMaterial3: true, colorScheme: lightColorScheme),
+          darkTheme: ThemeData(useMaterial3: true, colorScheme: darkColorScheme),
+          themeMode: state,
+        );
+      },
     );
   }
 
-  Route<dynamic>? _onGenerateRoute(RouteSettings settings) {
+  Route? _onGenerateRoute(RouteSettings settings) {
     return MaterialPageRoute(
       builder: (ctx) {
         switch (settings.name) {
@@ -43,6 +55,9 @@ class App extends StatelessWidget with GlobalContextUtil {
                 ),
                 BlocProvider(
                   create: (context) => services<CounterBloc>(),
+                ),
+                BlocProvider(
+                  create: (context) => themeBloc,
                 ),
               ],
               child: const HomePage(),

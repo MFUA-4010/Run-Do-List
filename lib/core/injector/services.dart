@@ -8,15 +8,16 @@ import 'package:rundolist/src/domain/repositories/shared_repository.dart';
 import 'package:rundolist/src/presentation/controllers/counter/counter_bloc.dart';
 import 'package:rundolist/src/presentation/controllers/duration/duration_bloc.dart';
 import 'package:rundolist/src/presentation/controllers/promt/promt_bloc.dart';
+import 'package:rundolist/src/presentation/controllers/theme/theme_bloc.dart';
 
 /// Dependency injector Global storage
 final services = GetIt.I;
 
 /// Dependency injection Global procedurAPI_KEYe
-FutureOr<void> initServices() async {
+FutureOr<void> initServices() {
   //! Register Repositories
 
-  services.registerLazySingleton<CloudReopository>(
+  services.registerLazySingleton<CloudRepository>(
     () => PasteCloudRepositoryImpl(),
   );
 
@@ -36,5 +37,9 @@ FutureOr<void> initServices() async {
 
   services.registerLazySingleton<PromtBloc>(
     () => PromtBloc(),
+  );
+
+  services.registerLazySingleton<ThemeBloc>(
+    () => ThemeBloc(),
   );
 }

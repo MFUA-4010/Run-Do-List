@@ -5,6 +5,7 @@ import 'package:rundolist/src/domain/entities/promt.dart';
 import 'package:rundolist/src/presentation/controllers/counter/counter_bloc.dart';
 import 'package:rundolist/src/presentation/controllers/duration/duration_bloc.dart';
 import 'package:rundolist/src/presentation/controllers/promt/promt_bloc.dart';
+import 'package:rundolist/src/presentation/controllers/theme/theme_bloc.dart';
 import 'package:rundolist/src/presentation/pages/result_page.dart';
 import 'package:rundolist/src/presentation/widgets/chips/add_chip.dart';
 import 'package:rundolist/src/presentation/widgets/chips/promt_chip.dart';
@@ -19,19 +20,27 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bloc = BlocProvider.of<PromtBloc>(context);
+    final promtBloc = BlocProvider.of<PromtBloc>(context);
+    final themeBloc = BlocProvider.of<ThemeBloc>(context);
+
+    Future<void> onThemeChangePressed() async {
+      themeBloc.add(const ChangeThemeEvent());
+    }
 
     return Scaffold(
-      appBar: _AppBar(context),
+      appBar: _AppBar(
+        context,
+        onThemeChangePressed: onThemeChangePressed,
+      ),
       body: Container(
         alignment: Alignment.center,
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
             Expanded(
-              child: _Content(bloc),
+              child: _Content(promtBloc),
             ),
-            _Footer(bloc)
+            _Footer(promtBloc)
           ],
         ),
       ),
@@ -42,7 +51,7 @@ class HomePage extends StatelessWidget {
 class _AppBar extends AppBar {
   _AppBar(
     BuildContext context, {
-    void Function()? onUploadPressed,
+    void Function()? onThemeChangePressed,
   }) : super(
           title: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,14 +70,20 @@ class _AppBar extends AppBar {
               ),
             ],
           ),
-          // actions: [
-          //   IconButton(
-          //     onPressed: onUploadPressed,
-          //     icon: const Icon(
-          //       Icons.upload_rounded,
-          //     ),
-          //   ),
-          // ],
+          actions: [
+            IconButton(
+              onPressed: onThemeChangePressed,
+              icon: const Icon(
+                Icons.mode_night_rounded,
+              ),
+            ),
+            // IconButton(
+            //   onPressed: onUploadPressed,
+            //   icon: const Icon(
+            //     Icons.upload_rounded,
+            //   ),
+            // ),
+          ],
         );
 }
 
@@ -126,7 +141,7 @@ class _Content extends StatelessWidget {
                 ),
                 AddChip(
                   fadeController: state.buttonFadeController,
-                  onPressed: onAddPressed,
+                  onPressed: () => onAddPressed(),
                 ),
               ],
             ),
@@ -198,7 +213,7 @@ class _Footer extends StatelessWidget {
                     Visibility(
                       visible: state.progress == Progress.inactive,
                       child: IconButton(
-                        onPressed: onTimeChangePressed,
+                        onPressed: () => onTimeChangePressed(),
                         icon: const Icon(
                           Icons.av_timer_rounded,
                         ),
@@ -227,7 +242,7 @@ class _Footer extends StatelessWidget {
                     Visibility(
                       visible: state.progress == Progress.inactive,
                       child: IconButton(
-                        onPressed: onCountChangePressed,
+                        onPressed: () => onCountChangePressed(),
                         icon: const Icon(
                           Icons.co2_outlined,
                         ),

@@ -2,7 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:rundolist/src/domain/entities/promt.dart';
 import 'package:rundolist/src/domain/repositories/cloud_repository.dart';
 
-class PasteCloudRepositoryImpl implements CloudReopository {
+class PasteCloudRepositoryImpl implements CloudRepository {
   static const _uri = 'https://pastebin.com/api/';
 
   String get getUri => '$_uri/api_raw.php';
