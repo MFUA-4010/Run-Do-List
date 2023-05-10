@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rundolist/utils/global_context_mixin.dart';
 
-class AppSnackBar extends SnackBar with GlobalContextUtil {
+class AppSnackBar extends SnackBar with GlobalContextMixin {
   AppSnackBar(
     BuildContext context,
     String title,

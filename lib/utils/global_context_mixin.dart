@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 final GlobalKey<NavigatorState> key = GlobalKey<NavigatorState>();
 
 /// Global [SnackBar] and [Dialog] builder util
-mixin GlobalContextUtil on Object {
+mixin GlobalContextMixin on Object {
   /// New [GlobalKey] for application
   /// Should be configured under global app widget
   BuildContext? get context => key.currentContext;

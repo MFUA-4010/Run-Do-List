@@ -10,6 +10,8 @@ import 'package:rundolist/src/domain/entities/enums/progress.dart';
 import 'package:rundolist/src/domain/entities/promt.dart';
 import 'package:rundolist/src/domain/usecases/promts/restore_cached_promts_usecase.dart';
 import 'package:rundolist/src/domain/usecases/promts/update_cacahed_promts_usecase.dart';
+import 'package:rundolist/src/domain/usecases/restore_cached_promts_usecase.dart';
+import 'package:rundolist/src/domain/usecases/update_cached_promts_usecase.dart';
 import 'package:rundolist/src/presentation/controllers/counter/counter_bloc.dart';
 import 'package:rundolist/src/presentation/controllers/duration/duration_bloc.dart';
 import 'package:rundolist/src/presentation/widgets/dialogs/change_promt_dialog.dart';
@@ -21,7 +23,7 @@ part 'promt_event.dart';
 part 'promt_state.dart';
 
 /// Home page controller [Bloc]
-class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextUtil {
+class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextMixin {
   /// [PromtBloc] constructor that handles all [Bloc] events
   PromtBloc() : super(const InitialPromtState()) {
     on<ReloadPromtEvent>(_onReloadPromtEvent);
@@ -385,7 +387,7 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextUtil {
           /// Start randomizing animations
           await _doRandomHiding(
             qState,
-            (List<int> results) async {
+            (List<int> results) {
               emit(
                 LoadedPromtState(
                   progress: Progress.done,
@@ -396,13 +398,13 @@ class PromtBloc extends Bloc<PromtEvent, PromtState> with GlobalContextUtil {
                   buttonFadeController: qState.buttonFadeController,
                 ),
               );
-
-              /// Restore all [Promt] chips on background
-              await Future.delayed(const Duration(seconds: 1), () {
-                add(const RestoreFadePromtEvent());
-              });
             },
           );
+
+          /// Restore all [Promt] chips on background
+          await Future.delayed(const Duration(seconds: 1), () {
+            add(const RestoreFadePromtEvent());
+          });
         }
         break;
 

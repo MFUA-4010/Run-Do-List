@@ -141,7 +141,7 @@ class _Content extends StatelessWidget {
                 ),
                 AddChip(
                   fadeController: state.buttonFadeController,
-                  onPressed: onAddPressed,
+                  onPressed: () => onAddPressed(),
                 ),
               ],
             ),
@@ -213,7 +213,7 @@ class _Footer extends StatelessWidget {
                     Visibility(
                       visible: state.progress == Progress.inactive,
                       child: IconButton(
-                        onPressed: onTimeChangePressed,
+                        onPressed: () => onTimeChangePressed(),
                         icon: const Icon(
                           Icons.av_timer_rounded,
                         ),
@@ -242,7 +242,7 @@ class _Footer extends StatelessWidget {
                     Visibility(
                       visible: state.progress == Progress.inactive,
                       child: IconButton(
-                        onPressed: onCountChangePressed,
+                        onPressed: () => onCountChangePressed(),
                         icon: const Icon(
                           Icons.co2_outlined,
                         ),

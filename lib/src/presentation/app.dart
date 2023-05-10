@@ -12,7 +12,7 @@ import 'package:rundolist/src/presentation/pages/home_page.dart';
 import 'package:rundolist/src/presentation/pages/result_page.dart';
 import 'package:rundolist/utils/global_context_mixin.dart';
 
-class App extends StatelessWidget with GlobalContextUtil {
+class App extends StatelessWidget with GlobalContextMixin {
   static const appTitle = 'Run Do List';
 
   late final ThemeBloc themeBloc;
@@ -40,7 +40,7 @@ class App extends StatelessWidget with GlobalContextUtil {
     );
   }
 
-  Route<dynamic>? _onGenerateRoute(RouteSettings settings) {
+  Route? _onGenerateRoute(RouteSettings settings) {
     return MaterialPageRoute(
       builder: (ctx) {
         switch (settings.name) {

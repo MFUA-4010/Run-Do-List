@@ -14,10 +14,10 @@ import 'package:rundolist/src/presentation/controllers/theme/theme_bloc.dart';
 final services = GetIt.I;
 
 /// Dependency injection Global procedurAPI_KEYe
-FutureOr<void> initServices() async {
+FutureOr<void> initServices() {
   //! Register Repositories
 
-  services.registerLazySingleton<CloudReopository>(
+  services.registerLazySingleton<CloudRepository>(
     () => PasteCloudRepositoryImpl(),
   );
 
