@@ -6,6 +6,7 @@ import 'package:rundolist/src/presentation/color_schemes.g.dart';
 import 'package:rundolist/src/presentation/controllers/counter/counter_bloc.dart';
 import 'package:rundolist/src/presentation/controllers/duration/duration_bloc.dart';
 import 'package:rundolist/src/presentation/controllers/promt/promt_bloc.dart';
+import 'package:rundolist/src/presentation/controllers/pseudo/pseudo_bloc.dart';
 import 'package:rundolist/src/presentation/controllers/theme/theme_bloc.dart';
 import 'package:rundolist/src/presentation/pages/forbidden_page.dart';
 import 'package:rundolist/src/presentation/pages/home_page.dart';
@@ -26,8 +27,6 @@ class App extends StatelessWidget with GlobalContextMixin {
     return BlocBuilder<ThemeBloc, ThemeMode>(
       bloc: themeBloc,
       builder: (context, state) {
-        print(state);
-
         return MaterialApp(
           title: appTitle,
           navigatorKey: key,
@@ -55,6 +54,9 @@ class App extends StatelessWidget with GlobalContextMixin {
                 ),
                 BlocProvider(
                   create: (context) => services<CounterBloc>(),
+                ),
+                BlocProvider(
+                  create: (context) => services<PseudoBloc>(),
                 ),
                 BlocProvider(
                   create: (context) => themeBloc,
