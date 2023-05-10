@@ -5,7 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:rundolist/core/usecase/usecase.dart';
 import 'package:rundolist/src/domain/usecases/theme/restore_cached_theme_usecase.dart';
-import 'package:rundolist/src/domain/usecases/theme/update_cacahed_theme_usecase.dart';
+import 'package:rundolist/src/domain/usecases/theme/update_cached_theme_usecase.dart';
 
 part 'theme_event.dart';
 

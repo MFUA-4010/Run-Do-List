@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rundolist/src/domain/entities/enums/progress.dart';
@@ -23,7 +25,7 @@ class HomePage extends StatelessWidget {
     final promtBloc = BlocProvider.of<PromtBloc>(context);
     final themeBloc = BlocProvider.of<ThemeBloc>(context);
 
-    Future<void> onThemeChangePressed() async {
+    FutureOr<void> onThemeChangePressed() {
       themeBloc.add(const ChangeThemeEvent());
     }
 
@@ -40,7 +42,7 @@ class HomePage extends StatelessWidget {
             Expanded(
               child: _Content(promtBloc),
             ),
-            _Footer(promtBloc)
+            _Footer(promtBloc),
           ],
         ),
       ),
@@ -136,6 +138,7 @@ class _Content extends StatelessWidget {
                   state.promts.length,
                   (i) {
                     final Promt promt = state.promts.elementAt(i);
+
                     return PromtChip(promt: promt);
                   },
                 ),
@@ -193,6 +196,11 @@ class _Footer extends StatelessWidget {
       counterBloc.add(ChangeCounterEvent(count));
     }
 
+    void onClearPressed() {
+      final counterBloc = BlocProvider.of<PromtBloc>(context);
+      counterBloc.add(const ClearPromtEvent());
+    }
+
     return ConstrainedBox(
       constraints: const BoxConstraints(
         maxWidth: 600.0,
@@ -244,7 +252,16 @@ class _Footer extends StatelessWidget {
                       child: IconButton(
                         onPressed: () => onCountChangePressed(),
                         icon: const Icon(
-                          Icons.co2_outlined,
+                          Icons.numbers_rounded,
+                        ),
+                      ),
+                    ),
+                    Visibility(
+                      visible: state.progress == Progress.inactive,
+                      child: IconButton(
+                        onPressed: () => onClearPressed(),
+                        icon: const Icon(
+                          Icons.clear_rounded,
                         ),
                       ),
                     ),
