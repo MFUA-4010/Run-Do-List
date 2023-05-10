@@ -10,4 +10,6 @@ abstract class SharedRepository {
 
   Future<Either<Error, int>> readCounter();
   Future<Either<Error, Unit>> updateCounter(int count);
+
+  Future<Either<Error, Unit>> clearPromts();
 }

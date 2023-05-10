@@ -37,6 +37,7 @@ class SharedRepositoryImpl implements SharedRepository {
   Future<Either<Error, Unit>> updateDuration(Duration duration) async {
     try {
       await (await prefs).setInt(_sharedDuration, duration.inSeconds);
+
       return const Right(unit);
     } catch (e) {
       return Left(UnimplementedError());
@@ -71,6 +72,7 @@ class SharedRepositoryImpl implements SharedRepository {
   Future<Either<Error, Unit>> updatePromts(List<Promt> promts) async {
     try {
       await (await prefs).setStringList(_sharedPromts, promts.map((e) => e.data).toList());
+
       return const Right(unit);
     } catch (e) {
       return Left(UnimplementedError());
@@ -96,6 +98,18 @@ class SharedRepositoryImpl implements SharedRepository {
   Future<Either<Error, Unit>> updateCounter(int count) async {
     try {
       await (await prefs).setInt(_sharedCounter, count);
+
+      return const Right(unit);
+    } catch (e) {
+      return Left(UnimplementedError());
+    }
+  }
+
+  @override
+  Future<Either<Error, Unit>> clearPromts() async {
+    try {
+      await (await prefs).setStringList(_sharedPromts, []);
+
       return const Right(unit);
     } catch (e) {
       return Left(UnimplementedError());

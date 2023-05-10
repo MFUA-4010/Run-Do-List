@@ -6,7 +6,7 @@ import 'package:rundolist/core/usecase/usecase.dart';
 import 'package:rundolist/src/domain/usecases/restore_duration_usecase.dart';
 import 'package:rundolist/src/domain/usecases/update_duration_usecase.dart';
 import 'package:rundolist/src/presentation/widgets/snack_bars/empty_duration_error_snack_bar.dart';
-import 'package:rundolist/src/presentation/widgets/snack_bars/nagative_duration_error_snack_bar.dart';
+import 'package:rundolist/src/presentation/widgets/snack_bars/negative_duration_error_snack_bar.dart';
 import 'package:rundolist/utils/global_context_mixin.dart';
 
 part 'duration_event.dart';
